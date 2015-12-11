@@ -1,0 +1,8 @@
+*.zip
+script_device_demo.lua
+script_device_restart.lua
+script_time_demo.lua
+script_variable_test2.lua
+script_device_thermostaat_demo.lua
+ESPGPIO.py
+script_variable_Ventilatie.lua

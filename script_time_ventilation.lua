@@ -29,6 +29,10 @@ function GetTotalMinutes(varTime)
 	return  (TimeHour*60+TimeMinutes)
 end
 
+function GetStringTime(timeMinutes)
+	return tostring(math.floor((timeMinutes/60))%24) .. ':' .. tostring(timeMinutes % 60)
+end
+
 if(otherdevices[deviceSetVentilationMasterSwithch]=="Off" ) then
 	return
 end
@@ -50,14 +54,15 @@ if(currentHotWaterTemp>hotWaterHighThreshold)  then
 	--check if we are lunning long enough by checking our time var
 	if(hotWaterOnAt==0) then	--hotwater just on so set it to the current time so we can check how long the shower is running
 		hotWaterOnAt = currentMinutes
-	elseif(currentMinutes-hotWaterOnAt>isShowerAfterMinutes) then
+		commandArray['Variable:'..varHotWaterOnAt] = GetStringTime(hotWaterOnAt)
+	elseif(currentMinutes-hotWaterOnAt >= isShowerAfterMinutes) then
 		showerOn=true
 	elseif(currentMinutes <hotWaterOnAt and currentMinutes +1440 -hotWaterOnAt>isShowerAfterMinutes) then --edge case for midnight
 		showerOn=true
 	end
 elseif(hotWaterOnAt>0) then	
 	--reset our hotwater on var so we start counting at zero
-	commandArray['Variable:'..varHotWaterOnAt] = tostring("00:00")
+	commandArray['Variable:'..varHotWaterOnAt] ="00:00"
 end
 	
 --check if changed and set our device
@@ -73,7 +78,7 @@ end
 --if shower is on set our offtime to now + 30 minutes. (TODO: based on humidity)
 if(showerOn) then
 	currentSwitchOffMinutes=currentMinutes+keepVentilationRunningAfterShower
-	commandArray['Variable:'..varVentilationOff] = tostring(math.floor((currentSwitchOffMinutes/60))%24) .. ':' .. tostring(currentSwitchOffMinutes % 60)
+	commandArray['Variable:'..varVentilationOff] = GetStringTime(currentSwitchOffMinutes) 
 else
 	--check if we need to switch the  ventilation off
 	if(currentSwitchOffMinutes>0) then
