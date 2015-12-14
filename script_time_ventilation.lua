@@ -21,7 +21,7 @@ varHotWaterOnAt = "HotWaterOnAt"
 varVentilationOff = "VentilationScriptBypassUntil"
 
 hotWaterHighThreshold=55
-isShowerAfterMinutes=5
+isShowerAfterMinutes=4
 keepVentilationRunningAfterShower = 30
 
 function GetTotalMinutes(varTime)
@@ -46,7 +46,15 @@ showerOn = false
 --decide wehter to set to setting one or setting two (setting 3 is controlled by shower)
 setVentilationToSettingOne = tonumber(uservariables[varWoodBurnerOn]) ==1 or otherdevices[deviceEveryOneAsleep] == "On" or otherdevices[deviceSomeOneAtHome] == "Off"
 --store current value (to check for change)
-isVentilationOneRunning = otherdevices[deviceVentilationSetting1] == "On"
+currentVentilationSetting = 0
+if(otherdevices[deviceVentilationSetting1] == "On") then
+	currentVentilationSetting =1
+elseif (otherdevices[deviceVentilationSetting2] == "On") then
+	currentVentilationSetting =2
+elseif (otherdevices[deviceVentilationSetting3] == "On") then
+	currentVentilationSetting =3
+end
+	
 --check for a high temperature for x minutes
 
 
@@ -92,11 +100,11 @@ else
 	end
 	
 	if(setVent) then
-		--which one, and is it changed
-		if(setVentilationToSettingOne and not isVentilationOneRunning ) then
+		--which one, and is it changed?
+		if(setVentilationToSettingOne and  currentVentilationSetting~=1 ) then
 			print("Ventilation 1 needs to be switched on")	
 			commandArray[deviceVentilationSetting1]="On"
-		elseif(not setVentilationToSettingOne and isVentilationOneRunning) then
+		elseif(not setVentilationToSettingOne and currentVentilationSetting~=2) then
 			print("Ventilation 2 needs to be switched on")
 			commandArray[deviceVentilationSetting2]="On"
 		end

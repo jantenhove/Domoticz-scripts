@@ -6,18 +6,27 @@ ventilationDevicSetting2 = "Ventilatie stand 2"
 ventilationDevicSetting3 = "Ventilatie stand 3"
 
 commandArray = {}
-if (devicechanged[ventilationDevicSetting1] == 'On') then		
-	commandArray[ventilationDevicSetting2]='Off'
-	commandArray[ventilationDevicSetting3]='Off'
-	SetVentilation(0)
+if (devicechanged[ventilationDevicSetting1] == 'On') then	
+	if(SetVentilation(0)) then
+		commandArray[ventilationDevicSetting2]='Off'
+		commandArray[ventilationDevicSetting3]='Off'
+	else
+		commandArray[ventilationDevicSetting1] = "Off"
+	end
 elseif (devicechanged[ventilationDevicSetting2] == 'On') then		
-	commandArray[ventilationDevicSetting1]='Off'
-	commandArray[ventilationDevicSetting3]='Off'
-	SetVentilation(1)
-elseif (devicechanged[ventilationDevicSetting3] == 'On') then		
-	commandArray[ventilationDevicSetting2]='Off'
-	commandArray[ventilationDevicSetting1]='Off'
-	SetVentilation(2)
+	if(SetVentilation(1)) then
+		commandArray[ventilationDevicSetting1]='Off'
+		commandArray[ventilationDevicSetting3]='Off'
+	else
+		commandArray[ventilationDevicSetting2] = "Off"
+	end
+elseif (devicechanged[ventilationDevicSetting3] == 'On') then	
+	if(SetVentilation(2)) then	
+		commandArray[ventilationDevicSetting2]='Off'
+		commandArray[ventilationDevicSetting1]='Off'
+	else
+		commandArray[ventilationDevicSetting3] = "Off"
+	end
 end
 return commandArray
 
