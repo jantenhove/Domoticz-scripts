@@ -10,6 +10,7 @@ commandArray = {}
 deviceSomeOneAtHome = "Iemand Thuis"
 deviceEveryOneAsleep = "Iedereen slaapt"
 deviceHotWaterTemp = "Heet water temperatuur"
+deviceHotWaterActive = "Heet water actief"
 deviceVentilationSetting1 = "Ventilatie stand 1"
 deviceVentilationSetting2 = "Ventilatie stand 2"
 deviceVentilationSetting3 = "Ventilatie stand 3"
@@ -19,8 +20,9 @@ deviceShoweringOn="Douche aan"
 varWoodBurnerOn = "Houtkachel aan"
 varHotWaterOnAt = "HotWaterOnAt"
 varVentilationOff = "VentilationScriptBypassUntil"
-
+humidityLiving = "Temperatuur woonkamer"
 hotWaterHighThreshold=55
+humidityLivingVentSettingOneThreshold = 55
 isShowerAfterMinutes=4
 keepVentilationRunningAfterShower = 30
 
@@ -42,9 +44,13 @@ currentMinutes =  date.hour *60 + date.min
 hotWaterOnAt = GetTotalMinutes(uservariables[varHotWaterOnAt])
 currentHotWaterTemp =  tonumber(otherdevices_svalues[deviceHotWaterTemp])
 setVent = otherdevices[deviceSetVentilationOnlyShowerSwitch]=="Off" 
+hotWaterActive = otherdevices[deviceHotWaterActive]=="On"
 showerOn = false
---decide wehter to set to setting one or setting two (setting 3 is controlled by shower)
-setVentilationToSettingOne = tonumber(uservariables[varWoodBurnerOn]) ==1 or otherdevices[deviceEveryOneAsleep] == "On" or otherdevices[deviceSomeOneAtHome] == "Off"
+humidityLiving = otherdevices_humidity[humidityLiving]
+--decide whether to set to setting one or setting two (setting 3 is controlled by shower)
+--setting 2 is only turned on 
+
+setVentilationToSettingOne = tonumber(uservariables[varWoodBurnerOn]) ==1 or otherdevices[deviceEveryOneAsleep] == "On" or humidityLiving < humidityLivingVentSettingOneThreshold
 --store current value (to check for change)
 currentVentilationSetting = 0
 if(otherdevices[deviceVentilationSetting1] == "On") then
@@ -58,7 +64,7 @@ end
 --check for a high temperature for x minutes
 
 
-if(currentHotWaterTemp>hotWaterHighThreshold)  then
+if(hotWaterActive and currentHotWaterTemp>hotWaterHighThreshold)  then
 	--check if we are lunning long enough by checking our time var
 	if(hotWaterOnAt==0) then	--hotwater just on so set it to the current time so we can check how long the shower is running
 		hotWaterOnAt = currentMinutes
@@ -70,7 +76,7 @@ if(currentHotWaterTemp>hotWaterHighThreshold)  then
 	end
 elseif(hotWaterOnAt>0) then	
 	--reset our hotwater on var so we start counting at zero
-	commandArray['Variable:'..varHotWaterOnAt] ="00:00"
+	commandArray['Variable:'..varHotWaterOnAt] ="00:00" --reset to zero 
 end
 	
 --check if changed and set our device
